@@ -106,7 +106,6 @@ subprojects { project ->
   def platform = System.getProperty("okhttp.platform", "platform")
 
   test {
-    jvmArgs += "-Dlistener=okhttp3.testing.InstallUncaughtExceptionHandlerListener"
     jvmArgs += "-Dokhttp.platform=$platform"
 
     testLogging {
@@ -142,6 +141,18 @@ subprojects { project ->
       check("MissingFail", CheckSeverity.ERROR)
       check("MissingOverride", CheckSeverity.ERROR)
     }
+  }
+
+  dependencies {
+    testCompile 'com.nordstrom.tools:junit-foundation:9.2.0'
+  }
+  // Must be applied after any dependencies have been added because this resolves them
+  ext {
+    junitFoundation = configurations.testCompile.resolvedConfiguration.resolvedArtifacts.find { it.name == 'junit-foundation' }
+  }
+
+  test {
+    jvmArgs += "-javaagent:${junitFoundation.file}"
   }
 
   apply plugin: 'org.jetbrains.dokka'
